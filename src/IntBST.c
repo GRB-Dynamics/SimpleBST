@@ -32,7 +32,7 @@ HIntBST IntBSTCreate(int initialval)
 
 
 //////////////////////////////////////////////
-bool IntBSTDestroy(HIntBST)
+bool IntBSTDestroy(HIntBST htree)
 	{
 	/* Fill In */
 	return false;

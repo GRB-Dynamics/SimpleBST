@@ -1,6 +1,6 @@
 //v0.2 copyright GRB-Dynamics 20160821U1338
-#ifndef IntBST_h
-#define IntBST_h
+//#ifndef IntBST_h
+//#define IntBST_h
 
 /////////////////////////////////////////////////
 #include <stdbool.h>
@@ -35,5 +35,5 @@ bool IntBSTPrint(HIntBST htree);
 
 
 
-#endif // IntBST_h
+// #endif // IntBST_h
 

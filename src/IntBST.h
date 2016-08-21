@@ -1,4 +1,4 @@
-//v0.1 copyright GRB-Dynamics 20160818R1332
+//v0.2 copyright GRB-Dynamics 20160821U1338
 #ifndef IntBST_h
 #define IntBST_h
 
@@ -10,7 +10,7 @@ typedef struct GIntBST *HIntBST;
 
 ////////////////////////////////////////////////
 /*  Creates a Binary Search Tree object with an initial value */
-HIntBST IntBSTCreate(int initialval);
+HIntBST IntBSTCreate(void);
 
 
 ////////////////////////////////////////////////

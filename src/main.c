@@ -5,8 +5,9 @@
 int main(void)
 	{
 	HIntBST htree;
-	htree=IntBSTCreate(10);
+	htree=IntBSTCreate();
 
+	IntBSTAdd(htree,10);
 	IntBSTAdd(htree,20);
 	IntBSTAdd(htree,5);
 

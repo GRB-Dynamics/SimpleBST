@@ -1,3 +1,4 @@
+//v0.2 copyright GRB-Dynamics 20160821U1338
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -5,16 +6,23 @@
 #include "IntBST.h"
 
 /////////////////////////////////////////////
-struct GIntBST
+struct GIntNode
 	{
-	struct IntBST *Left;
-	struct IntBST *Right;
+	struct IntNode *Left;
+	struct IntNode *Right;
 	int Value;
 	};
 
 
 /////////////////////////////////////////////
-HIntBST IntBSTCreate(int initialval)
+struct GIntBST
+	{
+	struct GIntNode *Root;
+	};
+
+
+/////////////////////////////////////////////
+HIntBST IntBSTCreate(void)
 	{
 	struct GIntBST *newnode=(struct GIntBST *)malloc(sizeof(struct GIntBST));
 	if(newnode==0)
@@ -22,10 +30,9 @@ HIntBST IntBSTCreate(int initialval)
 		fprintf(stderr,"Error: Unable to alloc memory\n");
 		return 0;
 		}
-
-	newnode->Left=0;
-	newnode->Right=0;
-	newnode->Value=initialval;
+	
+	// Empty Node List
+	newnode->Root=0;
 
 	return (HIntBST)newnode;
 	}

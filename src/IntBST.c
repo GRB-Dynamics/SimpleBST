@@ -49,6 +49,17 @@ bool IntBSTDestroy(HIntBST htree)
 	// To-do:
 	// Normally if this was C# we could just destroy the root node and garbage cleanup would destroy the unreachable children.
 	// But I'm guessing since C has memory issues we need to go through and destroy each child node?
+
+	/*
+		The simplist code is a recursive deletion of the tree. 
+
+		you should emplement a function called
+		
+		static bool GDeleteTree(struc GIntNode *node);
+
+		The static prefix is to make sure that the function is in inaccessable
+		to anyone using the function outside this file.
+	*/
 	return false;
 	}
 

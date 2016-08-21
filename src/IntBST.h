@@ -6,6 +6,8 @@
 #include <stdbool.h>
 
 /////////////////////////////////////////////////
+// A structure for our binary tree. 
+// It's a...pointer called HIntBST which is made up of GIntBST root node
 typedef struct GIntBST *HIntBST;
 
 ////////////////////////////////////////////////

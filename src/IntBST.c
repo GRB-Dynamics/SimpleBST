@@ -98,7 +98,7 @@ bool IntBSTDestroy(HIntBST htree)
 	// Free the GIntBST Node
 	free(htree);
 
-	return false;
+	return true;
 	}
 
 
@@ -200,6 +200,46 @@ bool IntBSTPrint(HIntBST htree)
 	// Recursively print the nodes by calling PrintNode on the root.
 	GPrintTree(htree->Root);
 	printf("\n");
+	
+	return true;
+	}
+
+
+////////////////////////////////////////////////
+bool IntBSTUnitTest(void)
+	{
+	printf("Testing IntBST\n");
+
+	/////////////////////////////////
+	// Copied code from main.c
+	HIntBST htree;
+
+	// Initialize htree to an empty tree.
+	htree=IntBSTCreate();
+
+	if(htree==0)
+		{
+		printf("**Unable to Create BST Instance\n");
+		return false;
+		}
+	
+	// Add nodes to the tree.
+	if(IntBSTAdd(htree,10)==false)
+		{
+		printf("**Unable to add node to BST\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+
+	//** Fill In rest of the code for unit testing
+	IntBSTAdd(htree,20);
+	IntBSTAdd(htree,5);
+
+	// Print the values of the tree.
+	IntBSTPrint(htree);
+
+	// Destroy the tree.
+	IntBSTDestroy(htree);
 	
 	return true;
 	}

@@ -34,6 +34,9 @@ bool IntBSTIsMember(HIntBST htree,int val);
 bool IntBSTPrint(HIntBST htree);
 
 
+//////////////////////////////////////////////
+//  Unit Test Code
+bool IntBSTUnitTest(void);
 
 
 // #endif // IntBST_h

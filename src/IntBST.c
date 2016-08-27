@@ -106,8 +106,9 @@ bool IntBSTDestroy(HIntBST htree)
 // Add a node to the binary tree. 
 bool IntBSTAdd(HIntBST htree,int val)
 	{
+	printf("Inside IntBSTAdd function.\n");
+
 	// Go through the tree checking whether each value is < or >
-		
 	struct GIntNode *tempnode; 	// Create a temporary node to traverse the tree to look for the value.
 	tempnode = htree->Root;		// Start tempnode off at the root node.
 
@@ -130,6 +131,7 @@ bool IntBSTAdd(HIntBST htree,int val)
 
 				// Change the tempnode to point to this new node.
 				tempnode->Left = newnode;
+				return true;
 				}
 			// The left child isn't empty, so continue traversing the tree.
 			else
@@ -150,6 +152,7 @@ bool IntBSTAdd(HIntBST htree,int val)
 
 				// Change the tempnode to point to this new node.
 				tempnode->Right = newnode;
+				return true;
 				}
 			// The right child isn't empty, so continue traversing the tree.
 			else
@@ -157,7 +160,23 @@ bool IntBSTAdd(HIntBST htree,int val)
 			}
 		}
 
-	// Why are these functions bool and not void? Return true if the function is successful, false if something goes wrong?
+	// Handle if it's the first item in the tree
+	/* Not sure if this is even necessary. */
+	if(tempnode == 0)
+		{  
+		printf("Adding the very first node.\n"); 
+		// Create the node.
+		struct GIntNode *newnode;
+		newnode->Value = val;
+		newnode->Left = 0;
+		newnode->Right = 0;
+
+		htree->Root = newnode;
+
+		return true;
+		}
+
+	// Only get to this point if we didn't add the node, so return false.
 	return false;
 	}
 
@@ -193,8 +212,7 @@ bool IntBSTPrint(HIntBST htree)
 	// If the tree is empty print that it's empty.
 	if(htree == 0) 
 		{ 
-		printf("Tree is empty."); 
-		return false;
+		printf("Tree is empty.\n"); 
 		}
 	
 	// Recursively print the nodes by calling PrintNode on the root.
@@ -216,31 +234,79 @@ bool IntBSTUnitTest(void)
 
 	// Initialize htree to an empty tree.
 	htree=IntBSTCreate();
-
 	if(htree==0)
 		{
-		printf("**Unable to Create BST Instance\n");
+		printf("**Unable to Create BST Instance.\n");
 		return false;
+		}
+	else
+		{
+		printf("Successfully created the BST Instance.\n");
 		}
 	
 	// Add nodes to the tree.
+
+	printf("0\n");
 	if(IntBSTAdd(htree,10)==false)
 		{
 		printf("**Unable to add node to BST\n");
 		IntBSTDestroy(htree);
 		return false;
 		}
+	else
+		{
+		printf("Successfully added a node to the tree.\n");
+		}
+	/* 
+	Tariq note: Problem starts here. 
+	(I added random printf's to see which parts of the code are reached.)
 
-	//** Fill In rest of the code for unit testing
-	IntBSTAdd(htree,20);
-	IntBSTAdd(htree,5);
+	It seems like IntBSTAdd is called but it can't add the second node.
+	The error is: "Segmentation fault (core dumped)"
+	*/
+	if(IntBSTAdd(htree,20)==false)
+		{
+		printf("**Unable to add node to BST\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully added a node to the tree.\n");
+		}
+
+	if(IntBSTAdd(htree,5)==false)
+		{
+		printf("**Unable to add node to BST\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully added a node to the tree.\n");
+		}
 
 	// Print the values of the tree.
-	IntBSTPrint(htree);
+	if(IntBSTPrint(htree) == false)
+		{ 
+		printf("Something went wrong trying to use IntBSTPrint.");
+		return false; 
+		}
+	else
+		{
+		printf("Successfully printed the values in the tree.");
+		}
 
 	// Destroy the tree.
-	IntBSTDestroy(htree);
-	
+	if(IntBSTDestroy(htree) == false)
+		{ 
+		printf("Something went wrong trying to use IntBSTDestroy.");
+		return false; 
+		}
+	else
+		{
+		printf("Successfully destroyed the tree..");
+		}	
 	return true;
 	}
 

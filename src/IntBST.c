@@ -223,6 +223,16 @@ bool IntBSTPrint(HIntBST htree)
 	}
 
 
+//**********************************************************
+// Unit Test Code
+//**********************************************************
+
+static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node);
+static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node);
+static bool GUTIsTreeOK(HIntBST htree);
+static bool GUTGetCount(struct GIntNode *node);
+
+
 ////////////////////////////////////////////////
 bool IntBSTUnitTest(void)
 	{
@@ -243,6 +253,16 @@ bool IntBSTUnitTest(void)
 		{
 		printf("Successfully created the BST Instance.\n");
 		}
+
+	if(GUTGetCount(htree->Root)!=0)
+		{
+		printf("**Bad Count of nodes in empty tree\n");
+		return false;
+		}
+
+	//***********************************************
+	// Start FILLING CODE to Verify everything!!!
+	//***********************************************
 	
 	// Add nodes to the tree.
 
@@ -309,4 +329,72 @@ bool IntBSTUnitTest(void)
 		}	
 	return true;
 	}
+
+
+/////////////////////////////////////////////////
+// check if subtree has values greater than value
+static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node)
+	{
+	if(node==0) { return true; }
+
+	// check if node value is grater than value
+	if(node->Value<=value)
+		{
+		printf("**Found value %d in node which is not greater than %d\n",node->Value,value);
+		return false;
+		}
+
+	// Recursively check the children
+	if(GUTIsSubTreeLargerThan(value,node->Right)==false) { return false; }
+	if(GUTIsSubTreeLargerThan(value,node->Left)==false) { return false; }
+
+	return true;
+	}
+
+
+/////////////////////////////////////////////////
+// Check if subtree has values smaller than value
+static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node)
+	{
+	if(node==0) { return true; }
+
+	// check if node value is grater than value
+	if(node->Value>=value)
+		{
+		printf("**Found value %d in node which is not smaller than %d\n",node->Value,value);
+		return false;
+		}
+
+	// Recursively check the children
+	if(GUTIsSubTreeSmallerThan(value,node->Right)==false) { return false; }
+	if(GUTIsSubTreeSmallerThan(value,node->Left)==false) { return false; }
+
+	return true;
+	}
+
+
+/////////////////////////////////////////////////
+static bool GUTIsTreeOK(HIntBST htree)
+	{
+	if(htree==0)
+		{
+		printf("**Handle to BST is bad\n");
+		return false;
+		}
+
+	
+
+	return true;
+	}
+
+/////////////////////////////////////////////////
+// Get Total count of nodes
+static bool GUTGetCount(struct GIntNode *node)
+	{
+	if(node==0) { return 0; }
+	return GUTGetCount(node->Left)+GUTGetCount(node->Right)+1;
+	}
+
+
+
 

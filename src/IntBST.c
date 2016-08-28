@@ -234,39 +234,55 @@ static bool GUTGetCount(struct GIntNode *node);
 
 
 ////////////////////////////////////////////////
+// Run a unit test to check the functions in this file.
 bool IntBSTUnitTest(void)
 	{
+	/* What we're testing:
+
+	1. Create the tree.
+	2. Add 5 nodes and verify the node count.
+	3. Search the tree for a value that isn't there.
+	4. Search the tree for a value that is there.
+	5. Print the nodes.
+	6. Delete a node.
+	7. Destroy the entire tree.
+
+	*/
+
+
 	printf("Testing IntBST\n");
 
 	/////////////////////////////////
-	// Copied code from main.c
+	// 1. CREATE THE TREE.
 	HIntBST htree;
 
 	// Initialize htree to an empty tree.
 	htree=IntBSTCreate();
-	if(htree==0)
+
+	// Check that the tree was created.
+	if(GUTIsTreeOK(htree) == false) 
 		{
-		printf("**Unable to Create BST Instance.\n");
-		return false;
+		printf("**Unable to create BST Instance.\n");
 		}
 	else
 		{
 		printf("Successfully created the BST Instance.\n");
 		}
 
+	// Check that there are no nodes in the tree yet.
 	if(GUTGetCount(htree->Root)!=0)
 		{
 		printf("**Bad Count of nodes in empty tree\n");
 		return false;
 		}
+	else
+		{
+		printf("Tree is successfully initialized with zero nodes.\n");
+		}
 
-	//***********************************************
-	// Start FILLING CODE to Verify everything!!!
-	//***********************************************
-	
-	// Add nodes to the tree.
-
-	printf("0\n");
+	/////////////////////////////////
+	// 2. Add nodes to the tree and verify the node count.
+	// Add the very first node.
 	if(IntBSTAdd(htree,10)==false)
 		{
 		printf("**Unable to add node to BST\n");
@@ -275,38 +291,146 @@ bool IntBSTUnitTest(void)
 		}
 	else
 		{
-		printf("Successfully added a node to the tree.\n");
+		printf("Successfully added the very first node (value of 10) to the tree.\n");
 		}
-	/* 
-	Tariq note: Problem starts here. 
-	(I added random printf's to see which parts of the code are reached.)
 
-	It seems like IntBSTAdd is called but it can't add the second node.
-	The error is: "Segmentation fault (core dumped)"
-	*/
+	// Check that there's one node in the tree.
+	if(GUTGetCount(htree->Root)!=1)
+		{
+		printf("**Bad Count of nodes in tree with one node.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Tree is successfully counted one nodes.\n");
+		}
+
+	/// Add the second node.
 	if(IntBSTAdd(htree,20)==false)
 		{
-		printf("**Unable to add node to BST\n");
+		printf("**Unable to add the second node (value 20) to BST\n");
 		IntBSTDestroy(htree);
 		return false;
 		}
 	else
 		{
-		printf("Successfully added a node to the tree.\n");
+		printf("Successfully added the second node (value of 20) to the tree.\n");
 		}
 
+	// Check that there's two nodes in the tree.
+	if(GUTGetCount(htree->Root)!=2)
+		{
+		printf("**Bad Count of nodes in tree with two nodes.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Tree is successfully counted two nodes.\n");
+		}
+
+	/// Add the third node.
 	if(IntBSTAdd(htree,5)==false)
 		{
-		printf("**Unable to add node to BST\n");
+		printf("**Unable to add the third node (value 5) to BST\n");
 		IntBSTDestroy(htree);
 		return false;
 		}
 	else
 		{
-		printf("Successfully added a node to the tree.\n");
+		printf("Successfully added the third node (value of 5) to the tree.\n");
 		}
 
-	// Print the values of the tree.
+	// Check that there's three nodes in the tree.
+	if(GUTGetCount(htree->Root)!=3)
+		{
+		printf("**Bad Count of nodes in tree with three nodes.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Tree is successfully counted three nodes.\n");
+		}
+
+	// Add the fourth node.
+	if(IntBSTAdd(htree,12)==false)
+		{
+		printf("**Unable to add the fourth node (value 12) to BST\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully added the fourth node (value of 12) to the tree.\n");
+		}
+
+	// Check that there's four nodes in the tree.
+	if(GUTGetCount(htree->Root)!=4)
+		{
+		printf("**Bad Count of nodes in tree with fourth nodes.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Tree is successfully counted four nodes.\n");
+		}
+
+	// Add the fifth node.
+	if(IntBSTAdd(htree,3)==false)
+		{
+		printf("**Unable to add the fifth node (value 3) to BST\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully added the fifth node (value of 3) to the tree.\n");
+		}
+
+	// Check that there's five nodes in the tree.
+	if(GUTGetCount(htree->Root)!=5)
+		{
+		printf("**Bad Count of nodes in tree with five node.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Tree is successfully counted five nodes.\n");
+		}
+
+	/////////////////////////////////////////////////
+	// 3. Search the tree for a value that isn't there.
+	if(IntBSTIsMember(htree, 100) == true)
+		{
+		printf("**Able to find 100 in the tree. We're not supposed to find a number we didn't add.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully did not find 100 in the tree. (It's not supposed to be there.)\n");
+		}
+	
+
+	/////////////////////////////////////////////////
+	// 4. Search the tree for a value that is there.
+	if(IntBSTIsMember(htree, 3) == false)
+		{
+		printf("**Unable to find 3 in the tree. It should be there.\n");
+		IntBSTDestroy(htree);
+		return false;
+		}
+	else
+		{
+		printf("Successfully found 3 in the tree.\n");
+		}
+
+	///////////////////////////////////////
+	// 5. Print the values of the tree.
 	if(IntBSTPrint(htree) == false)
 		{ 
 		printf("Something went wrong trying to use IntBSTPrint.");
@@ -317,7 +441,12 @@ bool IntBSTUnitTest(void)
 		printf("Successfully printed the values in the tree.");
 		}
 
-	// Destroy the tree.
+	///////////////////////////////////////
+	// 6. Delete a node.
+	/* Didn't write code to do this yet...It's on the to-do */
+
+	///////////////////////////////////////
+	// 7. Destroy the tree.
 	if(IntBSTDestroy(htree) == false)
 		{ 
 		printf("Something went wrong trying to use IntBSTDestroy.");
@@ -327,6 +456,7 @@ bool IntBSTUnitTest(void)
 		{
 		printf("Successfully destroyed the tree..");
 		}	
+
 	return true;
 	}
 
@@ -337,7 +467,7 @@ static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node)
 	{
 	if(node==0) { return true; }
 
-	// check if node value is grater than value
+	// check if node value is greater than value
 	if(node->Value<=value)
 		{
 		printf("**Found value %d in node which is not greater than %d\n",node->Value,value);
@@ -374,6 +504,7 @@ static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node)
 
 
 /////////////////////////////////////////////////
+// Check that the tree handler exists.
 static bool GUTIsTreeOK(HIntBST htree)
 	{
 	if(htree==0)
@@ -381,8 +512,6 @@ static bool GUTIsTreeOK(HIntBST htree)
 		printf("**Handle to BST is bad\n");
 		return false;
 		}
-
-	
 
 	return true;
 	}
@@ -394,7 +523,3 @@ static bool GUTGetCount(struct GIntNode *node)
 	if(node==0) { return 0; }
 	return GUTGetCount(node->Left)+GUTGetCount(node->Right)+1;
 	}
-
-
-
-

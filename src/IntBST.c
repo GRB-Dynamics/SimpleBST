@@ -27,6 +27,65 @@ struct GIntBST
 
 
 //////////////////////////////////////////////
+//////////////////////////////////////////////
+// Recursively go through tree to find where a node belongs.
+// If it belongs, add it.
+static bool GIntBSTAddNode(int val,struct GIntNode *node)
+	{
+	
+	// Check if the value is equal to current node.
+	// Means we can't add it so return false.
+	if(node->Value == val)
+		{ return false; }
+
+	// If the value is smaller...
+	if(node->Value > val)
+		{
+		// If the left child is empty, add the node there.
+		if(node->Left == 0)
+
+			{  
+			// Create the node and allocate space.
+			struct GIntNode *newnode = malloc(sizeof(struct GIntNode));
+			newnode->Value = val;
+			newnode->Left = 0;
+			newnode->Right = 0;
+
+			// Make the current node point to the new node.
+			node->Left = newnode;
+
+			return true;
+			}
+		// The left child isn't empty, so continue traversing the tree.
+		else
+			{ GIntBSTAddNode(val,node->Left); }
+		}
+	// If the value is larger...
+	else
+		{
+		// If the right child is empty, add the node there.
+		if(node->Right == 0)
+			{  
+			// Create the node and allocate space.
+			struct GIntNode *newnode = malloc(sizeof(struct GIntNode));
+			newnode->Value = val;
+			newnode->Left = 0;
+			newnode->Right = 0;
+
+			// Make the current node point to the new node.
+			node->Right = newnode;
+
+			return true;
+			}
+		// The left child isn't empty, so continue traversing the tree.
+		else
+			{ GIntBSTAddNode(val,node->Right); }
+		}
+
+	return false;
+	}
+
+
 // Deletes a node in a BST and calls itself to delete child nodes.
 static void GDeleteTree(struct GIntNode *node)
 	{
@@ -102,62 +161,6 @@ bool IntBSTDestroy(HIntBST htree)
 	}
 
 
-//////////////////////////////////////////////
-// Recursively go through tree to find where a node belongs.
-// If it belongs, add it.
-static bool GIntBSTAddNode(int val,struct GIntNode *node)
-	{
-	
-	// Check if the value is equal to current node.
-	// Means we can't add it so return false.
-	if(node->Value == val)
-		{ return false; }
-
-	// If the value is smaller...
-	if(node->Value > val)
-		{
-		// If the left child is empty, add the node there.
-		if(node->Left == 0)
-			{  
-			// Create the node and allocate space.
-			struct GIntNode *newnode = malloc(sizeof *newnode);
-			newnode->Value = val;
-			newnode->Left = 0;
-			newnode->Right = 0;
-
-			// Make the current node point to the new node.
-			node->Left = newnode;
-
-			return true;
-			}
-		// The left child isn't empty, so continue traversing the tree.
-		else
-			{ GIntBSTAddNode(val,node->Left); }
-		}
-	// If the value is larger...
-	else
-		{
-		// If the right child is empty, add the node there.
-		if(node->Right == 0)
-			{  
-			// Create the node and allocate space.
-			struct GIntNode *newnode = malloc(sizeof *newnode);
-			newnode->Value = val;
-			newnode->Left = 0;
-			newnode->Right = 0;
-
-			// Make the current node point to the new node.
-			node->Right = newnode;
-
-			return true;
-			}
-		// The left child isn't empty, so continue traversing the tree.
-		else
-			{ GIntBSTAddNode(val,node->Right); }
-		}
-
-	return false;
-	}
 
 //////////////////////////////////////////////
 // Add a node to the binary tree. 
@@ -167,7 +170,7 @@ bool IntBSTAdd(HIntBST htree,int val)
 	if(htree->Root == 0)
 		{
 		// Create the node and allocate space.
-		struct GIntNode *newnode = malloc(sizeof *newnode);
+		struct GIntNode *newnode = malloc(sizeof(struct GIntNode));
 		newnode->Value = val;
 		newnode->Left = 0;
 		newnode->Right = 0;

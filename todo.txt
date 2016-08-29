@@ -1,5 +1,4 @@
-
 1. Add a function to delete a node.
 2. Fix function for adding node. (Currently unable to add a second node.)
 3. Add to unit test a check that all the nodes in the tree are in the correct place. (Lower is to left, bigger is to right.)
-
+4. Change the Print function from bool to string and write a unit test that checks that the resulting string is correct?

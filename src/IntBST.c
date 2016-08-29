@@ -103,81 +103,83 @@ bool IntBSTDestroy(HIntBST htree)
 
 
 //////////////////////////////////////////////
+// Recursively go through tree to find where a node belongs.
+// If it belongs, add it.
+static bool GIntBSTAddNode(int val,struct GIntNode *node)
+	{
+	
+	// Check if the value is equal to current node.
+	// Means we can't add it so return false.
+	if(node->Value == val)
+		{ return false; }
+
+	// If the value is smaller...
+	if(node->Value > val)
+		{
+		// If the left child is empty, add the node there.
+		if(node->Left == 0)
+			{  
+			// Create the node and allocate space.
+			struct GIntNode *newnode = malloc(sizeof *newnode);
+			newnode->Value = val;
+			newnode->Left = 0;
+			newnode->Right = 0;
+
+			// Make the current node point to the new node.
+			node->Left = newnode;
+
+			return true;
+			}
+		// The left child isn't empty, so continue traversing the tree.
+		else
+			{ GIntBSTAddNode(val,node->Left); }
+		}
+	// If the value is larger...
+	else
+		{
+		// If the right child is empty, add the node there.
+		if(node->Right == 0)
+			{  
+			// Create the node and allocate space.
+			struct GIntNode *newnode = malloc(sizeof *newnode);
+			newnode->Value = val;
+			newnode->Left = 0;
+			newnode->Right = 0;
+
+			// Make the current node point to the new node.
+			node->Right = newnode;
+
+			return true;
+			}
+		// The left child isn't empty, so continue traversing the tree.
+		else
+			{ GIntBSTAddNode(val,node->Right); }
+		}
+
+	return false;
+	}
+
+//////////////////////////////////////////////
 // Add a node to the binary tree. 
 bool IntBSTAdd(HIntBST htree,int val)
 	{
-	printf("Inside IntBSTAdd function.\n");
-
-	// Go through the tree checking whether each value is < or >
-	struct GIntNode *tempnode; 	// Create a temporary node to traverse the tree to look for the value.
-	tempnode = htree->Root;		// Start tempnode off at the root node.
-
-	while(tempnode != 0)
+	// If the tree is empty add the first node to the root.
+	if(htree->Root == 0)
 		{
-		// If value is equal then we can't add it.
-		if(val == tempnode->Value) { break; }
-		
-		// If the value is less...
-		if(val < tempnode->Value)
-			{
-			// If the left child is empty, add the node there.
-			if(tempnode->Left == 0)
-				{  
-				// Create the node.
-				struct GIntNode *newnode;
-				newnode->Value = val;
-				newnode->Left = 0;
-				newnode->Right = 0;
-
-				// Change the tempnode to point to this new node.
-				tempnode->Left = newnode;
-				return true;
-				}
-			// The left child isn't empty, so continue traversing the tree.
-			else
-				{ tempnode = tempnode->Left; }
-			}
-
-		// If the value is greater...
-		else
-			{
-			// If the right child is empty, add the node there.
-			if(tempnode->Right == 0)
-				{  
-				// Create the node.
-				struct GIntNode *newnode;
-				newnode->Value = val;
-				newnode->Left = 0;
-				newnode->Right = 0;
-
-				// Change the tempnode to point to this new node.
-				tempnode->Right = newnode;
-				return true;
-				}
-			// The right child isn't empty, so continue traversing the tree.
-			else
-				{ tempnode = tempnode->Right; }
-			}
-		}
-
-	// Handle if it's the first item in the tree
-	/* Not sure if this is even necessary. */
-	if(tempnode == 0)
-		{  
-		printf("Adding the very first node.\n"); 
-		// Create the node.
-		struct GIntNode *newnode;
+		// Create the node and allocate space.
+		struct GIntNode *newnode = malloc(sizeof *newnode);
 		newnode->Value = val;
 		newnode->Left = 0;
 		newnode->Right = 0;
 
+		// Make the current node point to the new node.
 		htree->Root = newnode;
-
+		
 		return true;
 		}
 
-	// Only get to this point if we didn't add the node, so return false.
-	return false;
+	// Otherwise recursively search the tree for where the value should go.
+	return GIntBSTAddNode(val, htree->Root);
 	}
 
 
@@ -282,7 +284,8 @@ bool IntBSTUnitTest(void)
 
 	/////////////////////////////////
 	// 2. Add nodes to the tree and verify the node count.
-	// Add the very first node.
+	///// ADD NODE 1
+	// Add it.
 	if(IntBSTAdd(htree,10)==false)
 		{
 		printf("**Unable to add node to BST\n");
@@ -303,8 +306,12 @@ bool IntBSTUnitTest(void)
 		}
 	else
 		{
-		printf("Tree is successfully counted one nodes.\n");
+		printf("Successfully counted one nodes.\n");
 		}
+
+	// Print the current tree (should only be one node.)
+	printf("Nodes in tree so far: ");
+	IntBSTPrint(htree);
 
 	/// Add the second node.
 	if(IntBSTAdd(htree,20)==false)

@@ -229,9 +229,24 @@ bool IntBSTPrint(HIntBST htree)
 
 
 //**********************************************************
-// Unit Test Code
+// Unit Test Code 
 //**********************************************************
+// Forward reference all the unit tests
+static bool GUTMain1(void);
+static bool GUTMain2(void);
 
+////////////////////////////////////////////////////
+bool IntBSTUnitTest(void)
+	{
+	if(GUTMain1()==false) { return false; }
+	if(GUTMain2()==false) { return false; }
+	return true;
+	}
+
+
+//**********************************************************
+// Unit Test Code #1
+//**********************************************************
 static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node);
 static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node);
 static bool GUTIsTreeOK(HIntBST htree);
@@ -240,7 +255,7 @@ static bool GUTGetCount(struct GIntNode *node);
 
 ////////////////////////////////////////////////
 // Run a unit test to check the functions in this file.
-bool IntBSTUnitTest(void)
+bool GUTMain1(void)
 	{
 	/* What we're testing:
 
@@ -551,3 +566,14 @@ static bool GUTGetCount(struct GIntNode *node)
 	if(node==0) { return 0; }
 	return GUTGetCount(node->Left)+GUTGetCount(node->Right)+1;
 	}
+
+
+//**********************************************************
+// Unit Test Code #2
+//**********************************************************
+static bool GUTMain2(void)
+	{
+	/* Fill More Unit Tests */
+	return true;
+	}
+

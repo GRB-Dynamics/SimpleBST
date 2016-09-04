@@ -32,6 +32,7 @@ struct GIntBST
 // If it belongs, add it.
 static bool GIntBSTAddNode(int val,struct GIntNode *node)
 	{
+	bool valueWasAdded = false;
 	
 	// Check if the value is equal to current node.
 	// Means we can't add it so return false.
@@ -58,7 +59,7 @@ static bool GIntBSTAddNode(int val,struct GIntNode *node)
 			}
 		// The left child isn't empty, so continue traversing the tree.
 		else
-			{ GIntBSTAddNode(val,node->Left); }
+			{ valueWasAdded = GIntBSTAddNode(val,node->Left); }
 		}
 	// If the value is larger...
 	else
@@ -74,20 +75,16 @@ static bool GIntBSTAddNode(int val,struct GIntNode *node)
 
 			// Make the current node point to the new node.
 			node->Right = newnode;
-
+			
 			return true;
 			}
 		// The left child isn't empty, so continue traversing the tree.
 		else
-			{ GIntBSTAddNode(val,node->Right); }
+			{ valueWasAdded = GIntBSTAddNode(val,node->Right); }
 		}
 
-	// NOTE: 9001
-	// Wtf if we set this to return false then this function will actually 
-	// return false even if above at Note: 90210 returns the true.
-	// For example, if the following line is false and the tree is 10 5 20 
-	// and we want to add 12, then this method will return false even though we added it.
-	return true;
+
+	return valueWasAdded;
 	}
 
 

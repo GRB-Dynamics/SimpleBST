@@ -35,6 +35,16 @@ bool IntBSTPrint(HIntBST htree);
 
 
 //////////////////////////////////////////////
+// Find count of items in tree
+int IntBSTGetCount(HIntBST htree);
+
+
+//////////////////////////////////////////////
+// Will create a near complete tree
+bool IntBSTLevelTree(HIntBST htree);
+
+
+//////////////////////////////////////////////
 //  Unit Test Code
 bool IntBSTUnitTest(void);
 

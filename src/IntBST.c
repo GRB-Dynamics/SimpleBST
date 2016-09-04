@@ -43,8 +43,8 @@ static bool GIntBSTAddNode(int val,struct GIntNode *node)
 		{
 		// If the left child is empty, add the node there.
 		if(node->Left == 0)
-
 			{  
+
 			// Create the node and allocate space.
 			struct GIntNode *newnode = (struct GIntNode *)malloc(sizeof(struct GIntNode));
 			newnode->Value = val;
@@ -54,7 +54,7 @@ static bool GIntBSTAddNode(int val,struct GIntNode *node)
 			// Make the current node point to the new node.
 			node->Left = newnode;
 
-			return true;
+			return true; // Note: 90210
 			}
 		// The left child isn't empty, so continue traversing the tree.
 		else
@@ -82,7 +82,12 @@ static bool GIntBSTAddNode(int val,struct GIntNode *node)
 			{ GIntBSTAddNode(val,node->Right); }
 		}
 
-	return false;
+	// NOTE: 9001
+	// Wtf if we set this to return false then this function will actually 
+	// return false even if above at Note: 90210 returns the true.
+	// For example, if the following line is false and the tree is 10 5 20 
+	// and we want to add 12, then this method will return false even though we added it.
+	return true;
 	}
 
 
@@ -255,7 +260,7 @@ static bool GUTGetCount(struct GIntNode *node);
 
 ////////////////////////////////////////////////
 // Run a unit test to check the functions in this file.
-bool GUTMain1(void)
+static bool GUTMain1(void)
 	{
 	/* What we're testing:
 
@@ -476,12 +481,12 @@ bool GUTMain1(void)
 	// 5. Print the values of the tree.
 	if(IntBSTPrint(htree) == false)
 		{ 
-		printf("Something went wrong trying to use IntBSTPrint.");
+		printf("Something went wrong trying to use IntBSTPrint.\n");
 		return false; 
 		}
 	else
 		{
-		printf("Successfully printed the values in the tree.");
+		printf("Successfully printed the values in the tree.\n");
 		}
 
 	///////////////////////////////////////
@@ -492,12 +497,12 @@ bool GUTMain1(void)
 	// 7. Destroy the tree.
 	if(IntBSTDestroy(htree) == false)
 		{ 
-		printf("Something went wrong trying to use IntBSTDestroy.");
+		printf("Something went wrong trying to use IntBSTDestroy.\n");
 		return false; 
 		}
 	else
 		{
-		printf("Successfully destroyed the tree..");
+		printf("Successfully destroyed the tree.\n");
 		}	
 
 	return true;

@@ -10,6 +10,7 @@
 //* Module Elements( Internal to file)
 //*******************************************************
 // Our node for the tree. Contains left child, right child, and the data itself.
+//  leftsubtree <= currentnode < rightsubtree  
 struct GIntNode
 	{
 	struct GIntNode *Left;
@@ -27,109 +28,115 @@ struct GIntBST
 
 
 //////////////////////////////////////////////
-//////////////////////////////////////////////
-// Recursively go through tree to find where a node belongs.
-// If it belongs, add it.
-static bool GIntBSTAddNode(int val,struct GIntNode *node)
+static bool GIntBSTAddNode(int val,struct GIntNode *tree)
 	{
-	bool valueWasAdded = false;
+	assert(tree!=0);
 	
-	// Check if the value is equal to current node.
-	// Means we can't add it so return false.
-	if(node->Value == val)
-		{ return false; }
-
-	// If the value is smaller...
-	if(node->Value > val)
+	// Create the newnode with val
+	struct GIntNode *newnode = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	if(newnode==0)
 		{
-		// If the left child is empty, add the node there.
-		if(node->Left == 0)
-			{  
-
-			// Create the node and allocate space.
-			struct GIntNode *newnode = (struct GIntNode *)malloc(sizeof(struct GIntNode));
-			newnode->Value = val;
-			newnode->Left = 0;
-			newnode->Right = 0;
-
-			// Make the current node point to the new node.
-			node->Left = newnode;
-
-			return true; // Note: 90210
-			}
-		// The left child isn't empty, so continue traversing the tree.
-		else
-			{ valueWasAdded = GIntBSTAddNode(val,node->Left); }
+		fprintf(stderr,"**Unable to alloc memory\n");
+		return false;
 		}
-	// If the value is larger...
-	else
+		
+	newnode->Value = val;
+	newnode->Left = 0;
+	newnode->Right = 0;
+
+	for(struct GIntNode *p=tree; ; )
 		{
-		// If the right child is empty, add the node there.
-		if(node->Right == 0)
-			{  
-			// Create the node and allocate space.
-			struct GIntNode *newnode = (struct GIntNode *)malloc(sizeof(struct GIntNode));
-			newnode->Value = val;
-			newnode->Left = 0;
-			newnode->Right = 0;
-
-			// Make the current node point to the new node.
-			node->Right = newnode;
-			
-			return true;
+		if(val <= p->Value)
+			{
+			if(p->Left!=0){ p=p->Left; continue; }
+			p->Left = newnode;  return true;
 			}
-		// The left child isn't empty, so continue traversing the tree.
 		else
-			{ valueWasAdded = GIntBSTAddNode(val,node->Right); }
+			{
+			if(p->Right!=0) { p=p->Right; continue; }
+			p->Right = newnode; return true;
+			}
 		}
-
-
-	return valueWasAdded;
 	}
 
 
+////////////////////////////////////////////
 // Deletes a node in a BST and calls itself to delete child nodes.
 static void GDeleteTree(struct GIntNode *node)
 	{
-	// If the node has a left child, call GDeleteTree on it.
-	if(node->Left != 0)
-		{ GDeleteTree(node->Left); }
-
-	// If the node has a right child, call GDeleteTree on it.
-	if(node->Right != 0)
-		{ GDeleteTree(node->Right); }
-
-	// Now delete the node itself.
+	if(node==0) { return; }
+	GDeleteTree(node->Left);
+	GDeleteTree(node->Right);
+	
+	// Clean up all data from node
+	node->Left=0;
+	node->Right=0;
+	node->Value=0;
+	
 	free(node);
 	}
 
 
 //////////////////////////////////////////////
-// Recursively print the values in the tree.
-/** Converted to inorder traversal **/
+// print the values in the tree.
 static void GPrintTree(struct GIntNode *node)
 	{
 	if(node==0) { return; }
-
-	// Print Left
 	GPrintTree(node->Left);
-
-	// Print the value of the current node.
 	printf("%d ", node->Value);
-
-	// Print Right
 	GPrintTree(node->Right);
 	}
+	
+	
+///////////////////////////////////////////////
+static int GTreeGetCount(struct GIntNode *node)
+	{
+	if(node==0) { return 0; }
+	return GTreeGetCount(node->Left)+GTreeGetCount(node->Right)+1;
+	}
+	
+	
+//////////////////////////////////////////////
+static bool GRotateLeft(struct GIntNode *subtree)
+	{
+	if(subtree==0) { return false; }
+	if(subtree->Left==0) { return false; }
+	
+	/** Since data is very small, we can move the data around */
+	/** Fill In the code for a left rotate **/
+	return false;
+	}	
 
-
-
+////////////////////////////////////////////////
+static bool GCheckTree(struct GIntNode *subtree)
+	{
+	if(subtree==0) { return true; }
+	
+	// Check left side of tree
+	if(subtree->Left!=0 && subtree->Left->Value > subtree->Value)
+		{
+		fprintf(stderr,"**Error: Node %d has left value %d\n",subtree->Value
+				,subtree->Left->Value);
+		return false;
+		}
+		
+	// Check right side of tree
+	if(subtree->Right!=0 && subtree->Right->Value <= subtree->Value )
+		{
+		fprintf(stderr,"**Error: Node %d has right value %d\n",subtree->Value
+				,subtree->Right->Value);
+		return false;		
+		}
+		
+	if(GCheckTree(subtree->Left)==false) { return false; }
+	if(GCheckTree(subtree->Right)==false) { return false; }
+	
+	return true;
+	}
 
 //*******************************************************
 //* Module Interface Functions
 //*******************************************************
-
-/////////////////////////////////////////////
-// HIntBST structure that returns the parent node of a binary tree?
 HIntBST IntBSTCreate(void)
 	{
 	struct GIntBST *newnode=(struct GIntBST *)malloc(sizeof(struct GIntBST));
@@ -139,9 +146,7 @@ HIntBST IntBSTCreate(void)
 		return 0;
 		}
 	
-	// Empty Node List
 	newnode->Root=0;
-
 	return (HIntBST)newnode;
 	}
 
@@ -150,15 +155,9 @@ HIntBST IntBSTCreate(void)
 // Destroy an entire binary tree.
 bool IntBSTDestroy(HIntBST htree)
 	{
-	// If the htree (root node) isn't null, then call GDeleteTree to recursively delete it and call GDeleteTree on it's childnodes.
-	if(htree != 0)
-		{		
-		GDeleteTree(htree->Root); 
-		}
-
-	// Free the GIntBST Node
+	assert(htree!=0);
+	GDeleteTree(htree->Root);
 	free(htree);
-
 	return true;
 	}
 
@@ -168,22 +167,26 @@ bool IntBSTDestroy(HIntBST htree)
 // Add a node to the binary tree. 
 bool IntBSTAdd(HIntBST htree,int val)
 	{
-	// If the tree is empty add the first node to the root.
+	assert(htree!=0);
+	
 	if(htree->Root == 0)
 		{
 		// Create the node and allocate space.
 		struct GIntNode *newnode = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+		if(newnode==0)
+			{
+			fprintf(stderr,"**Unable to alloc memory\n");
+			return false;
+			}
+			
 		newnode->Value = val;
 		newnode->Left = 0;
 		newnode->Right = 0;
-
-		// Make the current node point to the new node.
 		htree->Root = newnode;
 		
 		return true;
 		}
 
-	// Otherwise recursively search the tree for where the value should go.
 	return GIntBSTAddNode(val, htree->Root);
 	}
 
@@ -192,10 +195,9 @@ bool IntBSTAdd(HIntBST htree,int val)
 // Search the tree for a value.
 bool IntBSTIsMember(HIntBST htree,int val)
 	{
-	struct GIntNode *tempnode; 	// Create a temporary node to traverse the tree to look for the value.
-	tempnode = htree->Root;		// Start tempnode off at the root node.
+	assert(htree!=0);
+	struct GIntNode *tempnode=htree->Root;
 	
-	// While we still have a node to check (because the tree isn't empty or we didn't pass over the value)...
 	while(tempnode != 0)
 		{
 		// If the value of this node is what we want, return true and break.
@@ -216,22 +218,35 @@ bool IntBSTIsMember(HIntBST htree,int val)
 // Print all members of the tree.
 bool IntBSTPrint(HIntBST htree)
 	{
-	// If the tree is empty print that it's empty.
-	if(htree == 0) 
-		{ 
-		printf("Tree is empty.\n"); 
-		}
-	
-	// Recursively print the nodes by calling PrintNode on the root.
+	assert(htree!=0);	
+
 	GPrintTree(htree->Root);
 	printf("\n");
-	
 	return true;
 	}
 
 
+///////////////////////////////////////////////
+int IntBSTGetCount(HIntBST htree)
+	{
+	assert(htree!=0);
+	return GTreeGetCount(htree->Root);
+	}
+	
+
+////////////////////////////////////////////////
+bool IntBSTLevelTree(HIntBST htree)
+	{
+	assert(htree!=0);
+	
+	// See https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
+	
+	return false;
+	}
+
+
 //**********************************************************
-// Unit Test Code 
+// Unit Testing Code 
 //**********************************************************
 // Forward reference all the unit tests
 static bool GUTMain1(void);
@@ -249,13 +264,6 @@ bool IntBSTUnitTest(void)
 //**********************************************************
 // Unit Test Code #1
 //**********************************************************
-static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node);
-static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node);
-static bool GUTIsTreeOK(HIntBST htree);
-static int GUTGetCount(struct GIntNode *node);
-
-
-////////////////////////////////////////////////
 // Run a unit test to check the functions in this file.
 static bool GUTMain1(void)
 	{
@@ -282,25 +290,20 @@ static bool GUTMain1(void)
 	htree=IntBSTCreate();
 
 	// Check that the tree was created.
-	if(GUTIsTreeOK(htree) == false) 
+	if(htree == 0) 
 		{
-		printf("**Unable to create BST Instance.\n");
-		}
-	else
-		{
-		printf("Successfully created the BST Instance.\n");
+		fprintf(stderr,"**Unable to create BST Instance.\n");
+		return false;
 		}
 
 	// Check that there are no nodes in the tree yet.
-	if(GUTGetCount(htree->Root)!=0)
+	if(IntBSTGetCount(htree)!=0)
 		{
 		printf("**Bad Count of nodes in empty tree\n");
 		return false;
 		}
-	else
-		{
-		printf("Tree is successfully initialized with zero nodes.\n");
-		}
+		
+	if(GCheckTree(htree->Root)==false) { return false; }		
 
 	/////////////////////////////////
 	// 2. Add nodes to the tree and verify the node count.
@@ -312,51 +315,18 @@ static bool GUTMain1(void)
 		IntBSTDestroy(htree);
 		return false;
 		}
-	else
-		{
-		printf("Successfully added the very first node (value of 10) to the tree.\n");
-		}
-
-	// Check that there's one node in the tree.
-	if(GUTGetCount(htree->Root)!=1)
-		{
-		printf("**Bad Count of nodes in tree with one node.\n");
-		IntBSTDestroy(htree);
-		return false;
-		}
-	else
-		{
-		printf("Successfully counted one nodes.\n");
-		}
-
-	// Print the current tree (should only be one node.)
-	printf("Nodes in tree so far: ");
-	IntBSTPrint(htree);
-
+		
+	if(GCheckTree(htree->Root)==false) { return false; }
+	
 	/// Add the second node.
 	if(IntBSTAdd(htree,20)==false)
 		{
-		printf("**Unable to add the second node (value 20) to BST\n");
+		fprintf(stderr,"**Unable to add the second node (value 20) to BST\n");
 		IntBSTDestroy(htree);
 		return false;
-		}
-	else
-		{
-		printf("Successfully added the second node (value of 20) to the tree.\n");
 		}
 
-	// Check that there's two nodes in the tree.
-	if(GUTGetCount(htree->Root)!=2)
-		{
-		printf("**Bad Count of nodes in tree with two nodes.\n");
-		printf("Counted %d nodes.\n",GUTGetCount(htree->Root));
-		IntBSTDestroy(htree);
-		return false;
-		}
-	else
-		{
-		printf("Successfully counted two nodes in the tree.\n");
-		}
+	if(GCheckTree(htree->Root)==false) { return false; }
 
 
 	// Print the current tree
@@ -371,22 +341,9 @@ static bool GUTMain1(void)
 		IntBSTDestroy(htree);
 		return false;
 		}
-	else
-		{
-		printf("Successfully added the third node (value of 5) to the tree.\n");
-		}
+		
+	if(GCheckTree(htree->Root)==false) { return false; }		
 
-	// Check that there's three nodes in the tree.
-	if(GUTGetCount(htree->Root)!=3)
-		{
-		printf("**Bad Count of nodes in tree with three nodes.\n");
-		IntBSTDestroy(htree);
-		return false;
-		}
-	else
-		{
-		printf("Successfully counted three nodes.\n");
-		}
 
 	// Print the current tree
 	printf("Nodes in tree so far: ");
@@ -399,23 +356,9 @@ static bool GUTMain1(void)
 		IntBSTDestroy(htree);
 		return false;
 		}
-	else
-		{
-		printf("Successfully added the fourth node (value of 12) to the tree.\n");
-		}
 
-	// Check that there's four nodes in the tree.
-	if(GUTGetCount(htree->Root)!=4)
-		{
-		printf("**Bad Count of nodes in tree with fourth nodes.\n");
-		IntBSTDestroy(htree);
-		return false;
-		}
-	else
-		{
-		printf("Successfully counted four nodes.\n");
-		}
-
+	if(GCheckTree(htree->Root)==false) { return false; }
+	
 	// Print the current tree
 	printf("Nodes in tree so far: ");
 	IntBSTPrint(htree);
@@ -427,52 +370,32 @@ static bool GUTMain1(void)
 		IntBSTDestroy(htree);
 		return false;
 		}
-	else
-		{
-		printf("Successfully added the fifth node (value of 3) to the tree.\n");
-		}
+		
+	if(GCheckTree(htree->Root)==false) { return false; }		
 
 	// Print the current tree
 	printf("Nodes in tree so far: ");
 	IntBSTPrint(htree);
 
-	// Check that there's five nodes in the tree.
-	if(GUTGetCount(htree->Root)!=5)
-		{
-		printf("**Bad Count of nodes in tree with five node.\n");
-		IntBSTDestroy(htree);
-		return false;
-		}
-	else
-		{
-		printf("Successfully counted five nodes.\n");
-		}
-
 	/////////////////////////////////////////////////
 	// 3. Search the tree for a value that isn't there.
 	if(IntBSTIsMember(htree, 100) == true)
 		{
-		printf("**Able to find 100 in the tree. We're not supposed to find a number we didn't add.\n");
+		fprintf(stderr,"**Able to find 100 in the tree. We're not supposed to find a number we didn't add.\n");
 		IntBSTDestroy(htree);
 		return false;
 		}
-	else
-		{
-		printf("Successfully did not find 100 in the tree. (It's not supposed to be there.)\n");
-		}
+		
+	if(GCheckTree(htree->Root)==false) { return false; }		
 	
 
 	/////////////////////////////////////////////////
 	// 4. Search the tree for a value that is there.
 	if(IntBSTIsMember(htree, 3) == false)
 		{
-		printf("**Unable to find 3 in the tree. It should be there.\n");
+		fprintf(stderr,"**Unable to find 3 in the tree. It should be there.\n");
 		IntBSTDestroy(htree);
 		return false;
-		}
-	else
-		{
-		printf("Successfully found 3 in the tree.\n");
 		}
 
 	///////////////////////////////////////
@@ -483,93 +406,17 @@ static bool GUTMain1(void)
 		printf("Something went wrong trying to use IntBSTPrint.\n");
 		return false; 
 		}
-	else
-		{
-		printf("Successfully printed the values in the tree.\n");
-		}
 
-	///////////////////////////////////////
-	// 6. Delete a node.
-	/* Didn't write code to do this yet...It's on the to-do */
-
-	///////////////////////////////////////
-	// 7. Destroy the tree.
 	if(IntBSTDestroy(htree) == false)
 		{ 
 		printf("Something went wrong trying to use IntBSTDestroy.\n");
 		return false; 
 		}
-	else
-		{
-		printf("Successfully destroyed the tree.\n");
-		}	
 
 	return true;
 	}
 
 
-/////////////////////////////////////////////////
-// check if subtree has values greater than value
-static bool GUTIsSubTreeLargerThan(int value,struct GIntNode *node)
-	{
-	if(node==0) { return true; }
-
-	// check if node value is greater than value
-	if(node->Value<=value)
-		{
-		printf("**Found value %d in node which is not greater than %d\n",node->Value,value);
-		return false;
-		}
-
-	// Recursively check the children
-	if(GUTIsSubTreeLargerThan(value,node->Right)==false) { return false; }
-	if(GUTIsSubTreeLargerThan(value,node->Left)==false) { return false; }
-
-	return true;
-	}
-
-
-/////////////////////////////////////////////////
-// Check if subtree has values smaller than value
-static bool GUTIsSubTreeSmallerThan(int value,struct GIntNode *node)
-	{
-	if(node==0) { return true; }
-
-	// check if node value is grater than value
-	if(node->Value>=value)
-		{
-		printf("**Found value %d in node which is not smaller than %d\n",node->Value,value);
-		return false;
-		}
-
-	// Recursively check the children
-	if(GUTIsSubTreeSmallerThan(value,node->Right)==false) { return false; }
-	if(GUTIsSubTreeSmallerThan(value,node->Left)==false) { return false; }
-
-	return true;
-	}
-
-
-/////////////////////////////////////////////////
-// Check that the tree handler exists.
-static bool GUTIsTreeOK(HIntBST htree)
-	{
-	if(htree==0)
-		{
-		printf("**Handle to BST is bad\n");
-		return false;
-		}
-
-	return true;
-	}
-
-/////////////////////////////////////////////////
-// Get Total count of nodes
-static int GUTGetCount(struct GIntNode *node)
-	{
-	if(node==0) { return 0; }
-	return GUTGetCount(node->Left)+GUTGetCount(node->Right)+1;
-	}
 
 
 //**********************************************************
@@ -577,7 +424,37 @@ static int GUTGetCount(struct GIntNode *node)
 //**********************************************************
 static bool GUTMain2(void)
 	{
-	/* Fill More Unit Tests */
+	HIntBST htree=IntBSTCreate();
+	if(htree==0)
+		{
+		fprintf(stderr,"**Unable to create an empty tree\n");
+		return false;
+		}
+		
+	// 113 is a prime number - checked with www.archimedes-lab.org/primOmatic.html
+	for(int i=0;i<113;++i)
+		{
+		// 13 and 113 are relatively prime
+		const int val =(13*i)%113;
+		if(IntBSTAdd(htree,val)==false)
+			{
+			fprintf(stderr,"Unable to add number to tree");
+			return false;
+			}
+
+		if(GCheckTree(htree->Root)==false) { return false; }
+		}
+		
+	for(int i=0;i<113;++i)
+		{
+		if(IntBSTIsMember(htree,i)==false)
+			{
+			fprintf(stderr,"**Missing member in tree");
+			return false;
+			}
+		}
+		
+	IntBSTDestroy(htree);
 	return true;
 	}
 

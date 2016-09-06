@@ -8,6 +8,7 @@
 
 //*******************************************************
 //* Module Elements( Internal to file)
+//*  See diagram for Tree structure: /docs/TreeStructure.pdf
 //*******************************************************
 // Our node for the tree. Contains left child, right child, and the data itself.
 //  leftsubtree <= currentnode < rightsubtree  
@@ -100,10 +101,28 @@ static int GTreeGetCount(struct GIntNode *node)
 static bool GRotateLeft(struct GIntNode *subtree)
 	{
 	if(subtree==0) { return false; }
-	if(subtree->Left==0) { return false; }
-	
-	/** Since data is very small, we can move the data around */
 
+	// My Mistake to check for Right Node
+	if(subtree->Right==0) { return false; }
+	
+	/** Since data is very small, we can move the data around
+	We Cannot move the subtree node, as it may be pointed to
+	by its own parent node.
+	*/
+
+	// Look at image /docs/RotateLeft.pdf
+	const int tempdata=subtree->Value;
+	subtree->Value=subtree->Right->Value;
+	subtree->Right->Value=tempdata;
+
+	struct GIntNode *originalright=subtree->Right;
+	subtree->Right=originalright->Right;
+	originalright->Right=originalright->Left;
+	originalright->Left=subtree->Left;
+	subtree->Left=originalright;
+	
+
+	/*
 	// Maybe we should check that this rotate is actually allowable?
 	// As in, it won't break the rest of the tree.
 
@@ -112,6 +131,8 @@ static bool GRotateLeft(struct GIntNode *subtree)
 	subtree->Value = subtree->Left->Value;
 	subtree->Left->Value = temp;
 
+	*/
+
 	return true;
 	}	
 
@@ -119,21 +140,9 @@ static bool GRotateLeft(struct GIntNode *subtree)
 //////////////////////////////////////////////
 static bool GRotateRight(struct GIntNode *subtree)
 	{
-	if(subtree==0) { return false; }
-	if(subtree->Right==0) { return false; }
-	
-	/** Since data is very small, we can move the data around */
+	/** Draw a diagram for rotate and implement the code **/
 
-
-	// Maybe we should check that this rotate is actually allowable?
-	// As in, it won't break the rest of the tree.
-
-	// Do the actual rotate - by switching the variable values.
-	int temp = subtree->Value;
-	subtree->Value = subtree->Right->Value;
-	subtree->Right->Value = temp;
-
-	return true;
+	return false;
 	}	
 
 
@@ -281,12 +290,15 @@ bool IntBSTLevelTree(HIntBST htree)
 // Forward reference all the unit tests
 static bool GUTMain1(void);
 static bool GUTMain2(void);
+static bool GUTMain3(void);	// Test GRotateLeft
 
 ////////////////////////////////////////////////////
 bool IntBSTUnitTest(void)
 	{
 	if(GUTMain1()==false) { return false; }
 	if(GUTMain2()==false) { return false; }
+	if(GUTMain3()==false) { return false; }
+	printf("Testing IntBST : ok\n");
 	return true;
 	}
 
@@ -447,8 +459,6 @@ static bool GUTMain1(void)
 	}
 
 
-
-
 //**********************************************************
 // Unit Test Code #2
 //**********************************************************
@@ -487,4 +497,56 @@ static bool GUTMain2(void)
 	IntBSTDestroy(htree);
 	return true;
 	}
+
+
+//**********************************************************
+// Unit Test Code #3
+//**********************************************************
+// Build tree from diagram /docs/RotateLeft and verify
+static bool GUTMain3(void)
+	{
+	HIntBST htree=IntBSTCreate();
+	assert(htree!=0);
+
+	IntBSTAdd(htree,10);
+	IntBSTAdd(htree,8);
+	IntBSTAdd(htree,12);
+	IntBSTAdd(htree,11);
+	IntBSTAdd(htree,13);
+	
+	struct GIntNode *root=htree->Root;
+	assert(root!=0 && root->Value==10);
+	assert(root->Left!=0 && root->Left->Value==8);
+	assert(root->Right!=0 && root->Right->Value==12);
+	assert(root->Right->Left!=0 && root->Right->Left->Value==11);
+
+	if(GCheckTree(root)==false)
+		{
+		fprintf(stderr,"**Bad tree before rotate\n");
+		return false;
+		}
+
+	if(GRotateLeft(root)==false)
+		{
+		fprintf(stderr,"**Unable to rotate left\n");
+		return false;
+		}
+
+	if(GCheckTree(root)==false)
+		{
+		fprintf(stderr,"**Bad tree after left rotate\n");
+		return false;
+		}
+
+	// Check if tree values are good
+	assert(root!=0 && root->Value==12);
+	assert(root->Right!=0 && root->Right->Value==13);
+	assert(root->Left!=0 && root->Left->Value==10);
+	assert(root->Left->Right!=0 && root->Left->Right->Value==11);
+	assert(root->Left->Left!=0 && root->Left->Left->Value==8);
+
+	IntBSTDestroy(htree);
+	return true;
+	}
+
 

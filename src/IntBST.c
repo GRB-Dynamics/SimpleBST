@@ -90,12 +90,32 @@ static void GPrintTree(struct GIntNode *node)
 	
 	
 ///////////////////////////////////////////////
+// Recursively get count of nodes under current node + itself
 static int GTreeGetCount(struct GIntNode *node)
 	{
 	if(node==0) { return 0; }
 	return GTreeGetCount(node->Left)+GTreeGetCount(node->Right)+1;
 	}
+
+///////////////////////////////////////////////
+// Recursively get height of subtree including input node.
+static int GTreeGetHeight(struct GIntNode *node)
+	{
+	if(node == 0) { return 0; }
+
+	int leftHeight = GTreeGetHeight(node->Left);
+	int rightHeight = GTreeGetHeight(node->Right);
 	
+	if(leftHeight > rightHeight)
+		{
+		return leftHeight+1;
+		}	
+	else
+		{
+		return rightHeight+1;
+		}
+
+	}
 	
 //////////////////////////////////////////////
 static bool GRotateLeft(struct GIntNode *subtree)
@@ -299,6 +319,16 @@ int IntBSTGetCount(HIntBST htree)
 	
 
 ////////////////////////////////////////////////
+// Get the height of the tree.
+int IntBSTGetHeight(HIntBST htree)
+	{
+	if(htree == 0) { return 0; }
+
+	return GTreeGetHeight(htree->Root);
+	}
+
+
+////////////////////////////////////////////////
 // Balance the tree using the Day-Stout-Warren algorithm.
 bool IntBSTLevelTree(HIntBST htree)
 	{
@@ -351,6 +381,7 @@ bool IntBSTLevelTree(HIntBST htree)
 static bool GUTMain1(void);
 static bool GUTMain2(void);
 static bool GUTMain3(void);	// Test GRotateLeft
+static bool GUTMain4(void);	// Test that the tree gets balanced.
 
 ////////////////////////////////////////////////////
 bool IntBSTUnitTest(void)
@@ -358,6 +389,7 @@ bool IntBSTUnitTest(void)
 	if(GUTMain1()==false) { return false; }
 	if(GUTMain2()==false) { return false; }
 	if(GUTMain3()==false) { return false; }
+	if(GUTMain4()==false) { return false; }
 	printf("Testing IntBST : ok\n");
 	return true;
 	}
@@ -609,4 +641,48 @@ static bool GUTMain3(void)
 	return true;
 	}
 
+//**********************************************************
+// Unit Test Code #4
+//**********************************************************
+// Check that the tree is balanced.
+static bool GUTMain4(void)
+	{
+	// Create a new tree.
+	HIntBST htree=IntBSTCreate();
+	assert(htree!=0);
 
+	// Add numbers 1 to 100 to tree. Should create a tall tree with all right nodes.
+	for(int i = 1; i <= 100; i++)
+		{
+		IntBSTAdd(htree,i);
+		}
+
+	// Get the height of the tree. Should be 100.
+	if(IntBSTGetHeight(htree) != 100)
+		{
+		fprintf(stderr,"**Test Tree original is not expected height of 100.\n");
+		return false;
+		}
+	if(IntBSTGetCount(htree) != 100)
+		{
+		fprintf(stderr,"**Test Tree original is not expected count of 100.\n");
+		return false;
+		}
+
+	// Call the balance function.
+	bool treeBalanced = IntBSTLevelTree(htree);
+	if(treeBalanced == false)
+		{
+		fprintf(stderr,"**Test Tree could not be balanced.\n");
+		return false;
+		}
+
+	// Get the height of the new tree. Expected height should be 7.
+	if(IntBSTGetHeight(htree) != 7)
+		{
+		fprintf(stderr,"**Test Tree balanced is not expected height of 7.\n");
+		return false;
+		}
+
+	return true;
+	}

@@ -103,9 +103,39 @@ static bool GRotateLeft(struct GIntNode *subtree)
 	if(subtree->Left==0) { return false; }
 	
 	/** Since data is very small, we can move the data around */
-	/** Fill In the code for a left rotate **/
-	return false;
+
+	// Maybe we should check that this rotate is actually allowable?
+	// As in, it won't break the rest of the tree.
+
+	// Do the actual rotate - by switching the variable values.
+	int temp = subtree->Value;
+	subtree->Value = subtree->Left->Value;
+	subtree->Left->Value = temp;
+
+	return true;
 	}	
+
+
+//////////////////////////////////////////////
+static bool GRotateRight(struct GIntNode *subtree)
+	{
+	if(subtree==0) { return false; }
+	if(subtree->Right==0) { return false; }
+	
+	/** Since data is very small, we can move the data around */
+
+
+	// Maybe we should check that this rotate is actually allowable?
+	// As in, it won't break the rest of the tree.
+
+	// Do the actual rotate - by switching the variable values.
+	int temp = subtree->Value;
+	subtree->Value = subtree->Right->Value;
+	subtree->Right->Value = temp;
+
+	return true;
+	}	
+
 
 ////////////////////////////////////////////////
 static bool GCheckTree(struct GIntNode *subtree)

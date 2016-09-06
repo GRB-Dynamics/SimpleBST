@@ -138,6 +138,31 @@ static bool GRotateRight(struct GIntNode *subtree)
 
 
 ////////////////////////////////////////////////
+static bool GTreeToVine(struct GIntNode *root)
+	{
+
+	return true;
+	}
+
+
+////////////////////////////////////////////////
+static bool GVineToTree(struct GIntNode *root, int size)
+	{
+
+
+	return true;
+	}
+
+////////////////////////////////////////////////
+static bool GCompress(struct GIntNode *root, int count)
+	{
+
+
+	return true;
+	}
+
+
+////////////////////////////////////////////////
 static bool GCheckTree(struct GIntNode *subtree)
 	{
 	if(subtree==0) { return true; }
@@ -265,13 +290,48 @@ int IntBSTGetCount(HIntBST htree)
 	
 
 ////////////////////////////////////////////////
+// Balance the tree using the Day-Stout-Warren algorithm.
 bool IntBSTLevelTree(HIntBST htree)
 	{
 	assert(htree!=0);
 	
 	// See https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
-	
-	return false;
+	/*	
+	Day–Stout–Warren_algorithm
+
+	1. Allocate a node, the "pseudo-root", and make the tree's actual root the right child of the pseudo-root.
+	2. Call tree-to-vine with the pseudo-root as its argument.
+	3. Call vine-to-tree on the pseudo-root and the size (number of elements) of the tree.
+	4. Make the tree's actual root equal to the pseudo-root's right child.
+	5. Dispose of the pseudo-root.
+
+	*/	
+
+	// 1. Allocate a node, the "pseudo-root", and make the tree's actual root the right child of the pseudo-root.
+	struct GIntNode *pseudoroot = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	if(pseudoroot==0)
+		{
+		fprintf(stderr,"**Unable to alloc memory\n");
+		return false;
+		}
+	pseudoroot->Right = htree->Root;
+	pseudoroot->Left = 0;
+	pseudoroot->Value = 0;
+
+	// 2. Call tree-to-vine with the pseudo-root as its argument.
+	GTreeToVine(pseudoroot);
+
+	// 3. Call vine-to-tree on the pseudo-root and the size (number of elements) of the tree.
+	GVineToTree(pseudoroot, GTreeGetCount(pseudoroot));
+
+	// 4. Make the tree's actual root equal to the pseudo-root's right child.
+	htree->Root = pseudoroot->Right;
+
+	// 5. Dispose of the pseudo-root.
+	free(pseudoroot);
+
+
+	return true;
 	}
 
 

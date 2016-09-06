@@ -1,5 +1,3 @@
-2. GUTGetCount doesn't work. Maybe it's something about where htree is pointing? It's spitting out also numbers for seemingly correctly added nodes.
-3. Add unit test for IntBSTIsMember
-4. Add to unit test a check that all the nodes in the tree are in the correct place. (Lower is to left, bigger is to right.)
-5. Change the Print function from bool to string and write a unit test that checks that the resulting string is correct?
-6. Add a function to delete a node.
+-Add unit test to check if tree is balanced.
+-Fill in functions for the DayStout algorithm.
+-Add a function to delete a node.

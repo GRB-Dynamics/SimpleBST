@@ -1,3 +1,2 @@
--Add unit test to check if tree is balanced.
--Fill in functions for the DayStout algorithm.
+-Fill out GRotateRight
 -Add a function to delete a node.

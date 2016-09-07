@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <math.h> // Using for the power function in VinesToLeaves
 #include "IntBST.h"
 
 
@@ -165,11 +166,78 @@ static bool GRotateRight(struct GIntNode *subtree)
 	return false;
 	}	
 
-
 ////////////////////////////////////////////////
-static bool GTreeToVine(struct GIntNode *root)
+static bool GCompress(struct GIntNode *root, int count)
 	{
+	printf("Compress.\n");
+	/* Straight from wikipedia: https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
 
+	routine compress(root, count)
+	    scanner ← root
+	    for i ← 1 to count
+		child ← scanner.right
+		scanner.right ← child.right
+		scanner ← scanner.right
+		child.right ← scanner.left
+		scanner.left ← child
+
+	*/
+	// Create a new node called scanner.
+	struct GIntNode *scanner = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	if(scanner==0)
+		{
+		fprintf(stderr,"**Unable to alloc memory\n");
+		return false;
+		}
+	// Set scanner's properties equal to root's properties.
+//	scanner->Value = root->Value;
+//	scanner->Left = root->Left;
+//	scanner->Right = root->Right;
+	scanner = root;
+	for(int i = 1; i <= count; i++)
+		{
+		printf("%d out of %d\n", i, count);
+GRotateLeft(scanner);
+/*
+		child ← scanner.right
+		scanner.right ← child.right
+		scanner ← scanner.right
+		child.right ← scanner.left
+		scanner.left ← child
+*/
+
+		// Evidently this is a left rotation. Like the GRotateLeft function, hmmmmmm?!
+/*
+		struct GIntNode *child = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+		if(child==0)
+			{
+			fprintf(stderr,"**Unable to alloc memory\n");
+			return false;
+			}
+
+//		child->Value = scanner->Right->Value;
+//		child->Left = scanner->Right->Left;
+//		child->Right = scanner->Right->Right;
+		child = scanner->Right;
+//		scanner->Right->Value = child->Right->Value;
+//		scanner->Right->Left = child->Right->Left;
+//		scanner->Right->Right = child->Right->Right;
+		scanner->Right = child->Right;
+//		scanner->Value = scanner->Right->Value;
+//		scanner->Left = scanner->Right->Left;
+//		scanner->Right = scanner->Right->Right;
+		scanner = scanner->Right;
+//		child->Right->Value = scanner->Left->Value;
+//		child->Right->Left = scanner->Left->Left;
+//		child->Right->Right = scanner->Left->Right;
+		child->Right = scanner->Left;
+//		scanner->Left->Value = child->Value;
+//		scanner->Left->Left = child->Left;
+//		scanner->Left->Right = child->Right;
+		scanner->Left = child;
+*/
+		}
+	printf("Ended Compress.\n");
 	return true;
 	}
 
@@ -177,16 +245,134 @@ static bool GTreeToVine(struct GIntNode *root)
 ////////////////////////////////////////////////
 static bool GVineToTree(struct GIntNode *root, int size)
 	{
+	printf("Starting GVineToTree.\n");
+	/*
+	/* Straight from wikipedia: https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
 
+	routine vine-to-tree(root, size)
+	    leaves ← size + 1 − 2⌊log2(size + 1))⌋
+	    compress(root, leaves)
+	    size ← size − leaves
+	    while size > 1
+		compress(root, ⌊size / 2⌋)
+		size ← ⌊size / 2⌋
+	*/
 
+	int exponentpart = (int)log(size+1)/log(2);
+	int powerpart = (int)pow(2, exponentpart);
+	int leaves = size + 1 - powerpart;
+	GCompress(root, leaves);
+	size = size - leaves;
+	while(size > 1)
+		{
+		GCompress(root, abs(size/2));
+		size = abs(size/2);
+		}
+	printf("Ended GVineToTree.\n");
 	return true;
 	}
 
+
 ////////////////////////////////////////////////
-static bool GCompress(struct GIntNode *root, int count)
+static bool GTreeToVine(struct GIntNode *root)
 	{
+	printf("Starting GTreeToVine.\n");
+	/*
+	routine tree-to-vine(root)
+	    // Convert tree to a "vine", i.e., a sorted linked list,
+	    // using the right pointers to point to the next node in the list
+	    tail ← root
+	    rest ← tail.right
+	    while rest ≠ nil
+		if rest.left = nil
+		    tail ← rest
+		    rest ← rest.right
+		else
+		    temp ← rest.left
+		    rest.left ← temp.right
+		    temp.right ← rest
+		    rest ← temp
+		    tail.right ← temp
+	*/
 
+	struct GIntNode *tail = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	if(tail==0)
+		{
+		fprintf(stderr,"**Unable to alloc memory\n");
+		return false;
+		}
+//	tail->Value = root->Value;
+//	tail->Left = root->Left;
+//	tail->Right = root->Right;
+	tail = root;
 
+	struct GIntNode *rest = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	if(rest==0)
+		{
+		fprintf(stderr,"**Unable to alloc memory\n");
+		return false;
+		}
+//	rest->Value = tail->Right->Value;
+//	rest->Left = tail->Right->Left;
+//	rest->Right = tail->Right->Right;
+	rest = tail->Right;
+	while(rest != 0)
+		{
+		if(rest->Left == 0)
+			{
+			/*
+			if rest.left = nil
+			    tail ← rest
+			    rest ← rest.right
+			*/
+//			tail->Value = rest->Value;
+//			tail->Left = rest->Left;
+//			tail->Right = rest->Right;
+			tail = rest;
+//			rest->Value = rest->Right->Value;
+//			rest->Left = rest->Right->Left;
+//			rest->Right = rest->Right->Right;
+			rest = rest->Right;
+			}		
+		else
+			{
+			// Looks like another rotate...
+			/*
+			    temp ← rest.left
+			    rest.left ← temp.right
+			    temp.right ← rest
+			    rest ← temp
+			    tail.right ← temp
+			*/		
+			struct GIntNode *temp = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+			if(temp==0)
+				{
+				fprintf(stderr,"**Unable to alloc memory\n");
+				return false;
+				}
+//			temp->Value = rest->Left->Value;
+//			temp->Left = rest->Left->Left;
+//			temp->Right = rest->Left->Right;
+			temp = rest->Left;
+//			rest->Left->Value = temp->Right->Value;
+//			rest->Left->Left = temp->Right->Left;
+//			rest->Left->Right = temp->Right->Right;
+			rest->Left = temp->Right;
+//			temp->Right->Value = rest->Value;
+//			temp->Right->Left = rest->Left;
+//			temp->Right->Right = rest->Right;
+			temp->Right = rest;
+//			rest->Value = temp->Value;
+//			rest->Left = temp->Left;
+//			rest->Right = temp->Right;
+			rest = temp;
+//			tail->Right->Value = temp->Right->Value;
+//			tail->Right->Left = temp->Right->Left;
+//			tail->Right->Right = temp->Right->Right;
+			tail->Right = temp;	
+			}
+		}
+	printf("Ended GTreeToVine.\n");	
 	return true;
 	}
 

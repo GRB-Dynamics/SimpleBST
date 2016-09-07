@@ -175,30 +175,28 @@ static bool GRotateRight(struct GIntNode *subtree)
 ////////////////////////////////////////////////
 static bool GCompress(struct GIntNode *root, int count)
 	{
-	// Create a new node called scanner.
-	struct GIntNode *scanner = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	// Create a new node called scanner and set it equal to root.
+	struct GIntNode *scanner = root;
 	if(scanner==0)
 		{
 		fprintf(stderr,"**Unable to alloc memory\n");
 		return false;
 		}
-	// Set scanner's properties equal to root's properties.
-	scanner = root;
 	
 	for(int i = 1; i <= count; i++)
 		{
-		struct GIntNode *child = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+		struct GIntNode *child = scanner->Right;
 		if(child==0)
 			{
 			fprintf(stderr,"**Unable to alloc memory\n");
 			return false;
 			}
 
-		child = scanner->Right;
 		scanner->Right = child->Right;
 		scanner = scanner->Right;
 		child->Right = scanner->Left;
 		scanner->Left = child;
+		
 
 		}
 
@@ -227,22 +225,19 @@ static bool GVineToTree(struct GIntNode *root, int size)
 ////////////////////////////////////////////////
 static bool GTreeToVine(struct GIntNode *root)
 	{
-	struct GIntNode *tail = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	struct GIntNode *tail = root;
 	if(tail==0)
 		{
 		fprintf(stderr,"**Unable to alloc memory\n");
 		return false;
 		}
 
-	tail = root;
-
-	struct GIntNode *rest = (struct GIntNode *)malloc(sizeof(struct GIntNode));
+	struct GIntNode *rest = tail->Right;
 	if(rest==0)
 		{
 		fprintf(stderr,"**Unable to alloc memory\n");
 		return false;
 		}
-	rest = tail->Right;
 
 	while(rest != 0)
 		{

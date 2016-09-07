@@ -141,18 +141,6 @@ static bool GRotateLeft(struct GIntNode *subtree)
 	originalright->Right=originalright->Left;
 	originalright->Left=subtree->Left;
 	subtree->Left=originalright;
-	
-
-	/*
-	// Maybe we should check that this rotate is actually allowable?
-	// As in, it won't break the rest of the tree.
-
-	// Do the actual rotate - by switching the variable values.
-	int temp = subtree->Value;
-	subtree->Value = subtree->Left->Value;
-	subtree->Left->Value = temp;
-
-	*/
 
 	return true;
 	}	
@@ -161,9 +149,27 @@ static bool GRotateLeft(struct GIntNode *subtree)
 //////////////////////////////////////////////
 static bool GRotateRight(struct GIntNode *subtree)
 	{
-	/** Draw a diagram for rotate and implement the code **/
+	if(subtree==0) { return false; }
+	if(subtree->Left==0) { return false; }
 
-	return false;
+	// This should be the reverse of a Left Rotate. 
+	// Look at the docs/RotateLeft.pdf and read from bottom to top.
+
+	// (I still have to draw a nice diagram for this...)
+
+	// Switch the values of the parent and the left child.
+	const int tempdata=subtree->Value;
+	subtree->Value=subtree->Left->Value;
+	subtree->Left->Value=tempdata;
+
+	// Do the node swapping.
+	struct GIntNode *originalleft=subtree->Left;
+	subtree->Left=originalleft->Left;
+	originalleft->Left=originalleft->Right;
+	originalleft->Right=subtree->Right;
+	subtree->Right=originalleft;
+
+	return true;
 	}	
 
 ////////////////////////////////////////////////
@@ -455,7 +461,7 @@ bool IntBSTLevelTree(HIntBST htree)
 // Forward reference all the unit tests
 static bool GUTMain1(void);
 static bool GUTMain2(void);
-static bool GUTMain3(void);	// Test GRotateLeft
+static bool GUTMain3(void);	// Test GRotateLeft and GRotateRight
 static bool GUTMain4(void);	// Test that the tree gets balanced.
 
 ////////////////////////////////////////////////////
@@ -621,7 +627,7 @@ static bool GUTMain1(void)
 		printf("Something went wrong trying to use IntBSTDestroy.\n");
 		return false; 
 		}
-
+	
 	return true;
 	}
 
@@ -686,6 +692,7 @@ static bool GUTMain3(void)
 	assert(root->Left!=0 && root->Left->Value==8);
 	assert(root->Right!=0 && root->Right->Value==12);
 	assert(root->Right->Left!=0 && root->Right->Left->Value==11);
+	assert(root->Right->Right!=0 && root->Right->Right->Value==13);
 
 	if(GCheckTree(root)==false)
 		{
@@ -711,6 +718,27 @@ static bool GUTMain3(void)
 	assert(root->Left!=0 && root->Left->Value==10);
 	assert(root->Left->Right!=0 && root->Left->Right->Value==11);
 	assert(root->Left->Left!=0 && root->Left->Left->Value==8);
+
+
+	// Test GRotateRight
+	if(GRotateRight(root)==false)
+		{
+		fprintf(stderr,"**Unable to rotate right\n");
+		return false;
+		}
+
+	if(GCheckTree(root)==false)
+		{
+		fprintf(stderr,"**Bad tree after right rotate\n");
+		return false;
+		}
+
+	// Check if the values are good (they should be exactly the same as before left rotate).
+	assert(root!=0 && root->Value==10);
+	assert(root->Left!=0 && root->Left->Value==8);
+	assert(root->Right!=0 && root->Right->Value==12);
+	assert(root->Right->Left!=0 && root->Right->Left->Value==11);
+	assert(root->Right->Right!=0 && root->Right->Right->Value==13);
 
 	IntBSTDestroy(htree);
 	return true;
@@ -762,6 +790,8 @@ static bool GUTMain4(void)
 		IntBSTDestroy(htree);
 		return false;
 		}
+
+	IntBSTDestroy(htree);
 
 	return true;
 	}

@@ -153,21 +153,21 @@ static bool GRotateRight(struct GIntNode *subtree)
 	if(subtree->Left==0) { return false; }
 
 	// This should be the reverse of a Left Rotate. 
-	// Look at the docs/RotateLeft.pdf and read from bottom to top.
 
-	// (I still have to draw a nice diagram for this...)
+	// See docs/RotateRight.pdf for a super nice diagram.
 
-	// Switch the values of the parent and the left child.
+	/* (1) */ // Swap the values of A and B
 	const int tempdata=subtree->Value;
 	subtree->Value=subtree->Left->Value;
 	subtree->Left->Value=tempdata;
 
-	// Do the node swapping.
-	struct GIntNode *originalleft=subtree->Left;
-	subtree->Left=originalleft->Left;
-	originalleft->Left=originalleft->Right;
-	originalleft->Right=subtree->Right;
-	subtree->Right=originalleft;
+	/* (2) */ struct GIntNode *originalleft=subtree->Left;	// Create a copy of B, called OL.
+	/* (3) */ subtree->Left=originalleft->Left;		// Make A->Left point to C. (B gets lost in space.)
+	/* (4) */ originalleft->Left=originalleft->Right;	// Make OL->Right point to D.
+	/* (5) */ originalleft->Right=subtree->Right;		// Make OL->Left point to E.
+	/* (6) */ subtree->Right=originalleft;			// Make A->Right point to OL.
+
+	// Shouldn't we free up Node B from malloc?
 
 	return true;
 	}	

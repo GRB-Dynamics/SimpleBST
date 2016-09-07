@@ -409,18 +409,63 @@ int IntBSTGetHeight(HIntBST htree)
 bool IntBSTLevelTree(HIntBST htree)
 	{
 	assert(htree!=0);
+
+	// NEW WAY
+	// Helpful resource: https://xuyuanguo.wordpress.com/2013/02/06/dsw-algorithm-balancing-binary-search-tree/
+
+	// 1. Make the tree completely unbalanced (straight) to the right, by doing right rotations on all left children.
+	// Should look like:
+	// \
+	//  \
+	//   \
+	//    \
+
+	struct GIntNode *currentNode = htree->Root;	// Start at the root.
+
+	while(currentNode != 0)				// Go through each node from root until the bottom right.
+		{
+		while(currentNode->Left != 0)		// Call RightRotate on each node until it has no left children.
+			{
+			GRotateRight(currentNode);
+			}
+		currentNode = currentNode->Right;	// Update our current node.
+		}
 	
-	// See https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
-	/*	
-	Day–Stout–Warren_algorithm
+	// Quick test. If the height isn't equal to the number of nodes in the tree, this step failed.
+	if(IntBSTGetCount(htree) != IntBSTGetHeight(htree))
+		{
+		return false;
+		}
 
-	1. Allocate a node, the "pseudo-root", and make the tree's actual root the right child of the pseudo-root.
-	2. Call tree-to-vine with the pseudo-root as its argument.
-	3. Call vine-to-tree on the pseudo-root and the size (number of elements) of the tree.
-	4. Make the tree's actual root equal to the pseudo-root's right child.
-	5. Dispose of the pseudo-root.
-
+	// 2. Do enough left rotations for the tree to become balanced?
+	// Do it the Day way for now.
+	// According to http://penguin.ewu.edu/~trolfe/DSWpaper/
+	/*
+	1. Reduce the length of the backbone by 1
+	2. Divide the length of the backbone by 2 [rounding down if the length is not even] to find the number of transformations, m.
+	3. If m is zero, exit; otherwise perform m transformations on the backbone.
+	4. Return to 1.
 	*/	
+
+	int backbonecount = IntBSTGetCount(htree);
+	while( (backbonecount-1)/2 != 0 )
+		{
+		printf("Backbonecount: %d     Transform: %d\n", backbonecount, (backbonecount-1)/2);
+		// Do the rotates.
+		for(int i = 0; i < (backbonecount-1)/2; i++)
+			{
+			GRotateLeft(htree->Root);
+			}
+
+		backbonecount = backbonecount - (backbonecount-1)/2 - 1;	// Actually reduce the backbone count now.
+		}
+	
+
+	////////////////////////////////////////
+	/* OLD WAY OF COPYING WIKIPEDIA - It works though.
+	// See https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
+	
+	//Day–Stout–Warren_algorithm
 
 	// 1. Allocate a node, the "pseudo-root", and make the tree's actual root the right child of the pseudo-root.
 	struct GIntNode *pseudoroot = (struct GIntNode *)malloc(sizeof(struct GIntNode));
@@ -444,7 +489,8 @@ bool IntBSTLevelTree(HIntBST htree)
 
 	// 5. Dispose of the pseudo-root.
 	free(pseudoroot);
-
+	*/
+	/////////////////////////////////////////
 
 	return true;
 	}
@@ -779,9 +825,10 @@ static bool GUTMain4(void)
 		}
 
 	// Get the height of the new tree. Expected height should be 7.
-	if(IntBSTGetHeight(htree) != 7)
+	int newheight = IntBSTGetHeight(htree);
+	if(newheight != 7)
 		{
-		fprintf(stderr,"**Test Tree balanced is not expected height of 7.\n");
+		fprintf(stderr,"**Test Tree balanced is not expected height of 7. The height after calling BalanceTree is %d.\n", newheight);
 		IntBSTDestroy(htree);
 		return false;
 		}

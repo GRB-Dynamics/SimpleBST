@@ -172,100 +172,6 @@ static bool GRotateRight(struct GIntNode *subtree)
 	return true;
 	}	
 
-////////////////////////////////////////////////
-static bool GCompress(struct GIntNode *root, int count)
-	{
-	// Create a new node called scanner and set it equal to root.
-	struct GIntNode *scanner = root;
-	if(scanner==0)
-		{
-		fprintf(stderr,"**Unable to alloc memory\n");
-		return false;
-		}
-	
-	for(int i = 1; i <= count; i++)
-		{
-		struct GIntNode *child = scanner->Right;
-		if(child==0)
-			{
-			fprintf(stderr,"**Unable to alloc memory\n");
-			return false;
-			}
-
-		scanner->Right = child->Right;
-		scanner = scanner->Right;
-		child->Right = scanner->Left;
-		scanner->Left = child;
-		
-
-		}
-
-	return true;
-	}
-
-
-////////////////////////////////////////////////
-static bool GVineToTree(struct GIntNode *root, int size)
-	{
-	int exponentpart = (int)log2(size+1);
-	int powerpart = (int)pow(2, exponentpart);
-	int leaves = size + 1 - powerpart;
-	GCompress(root, leaves);
-	size = size - leaves;
-	while(size > 1)
-		{
-		GCompress(root, abs(size/2));
-		size = abs(size/2);
-		}
-
-	return true;
-	}
-
-
-////////////////////////////////////////////////
-static bool GTreeToVine(struct GIntNode *root)
-	{
-	struct GIntNode *tail = root;
-	if(tail==0)
-		{
-		fprintf(stderr,"**Unable to alloc memory\n");
-		return false;
-		}
-
-	struct GIntNode *rest = tail->Right;
-	if(rest==0)
-		{
-		fprintf(stderr,"**Unable to alloc memory\n");
-		return false;
-		}
-
-	while(rest != 0)
-		{
-		if(rest->Left == 0)
-			{
-			tail = rest;
-			rest = rest->Right;
-			}		
-		else
-			{
-			struct GIntNode *temp = (struct GIntNode *)malloc(sizeof(struct GIntNode));
-			if(temp==0)
-				{
-				fprintf(stderr,"**Unable to alloc memory\n");
-				return false;
-				}
-
-			temp = rest->Left;
-			rest->Left = temp->Right;
-			temp->Right = rest;
-			rest = temp;
-			tail->Right = temp;	
-			}
-		}
-
-	return true;
-	}
-
 
 ////////////////////////////////////////////////
 static bool GCheckTree(struct GIntNode *subtree)
@@ -410,9 +316,7 @@ bool IntBSTLevelTree(HIntBST htree)
 	{
 	assert(htree!=0);
 
-	// NEW WAY
 	// Helpful resource: https://xuyuanguo.wordpress.com/2013/02/06/dsw-algorithm-balancing-binary-search-tree/
-
 	// 1. Make the tree completely unbalanced (straight) to the right, by doing right rotations on all left children.
 	// Should look like:
 	// \
@@ -439,6 +343,7 @@ bool IntBSTLevelTree(HIntBST htree)
 		return false;
 		}
 
+
 	// 2. Do enough left rotations for the tree to become balanced.
 	// Source: http://www.radford.edu/~mhtay/ITEC360/webpage/Lecture/06_p2_new.pdf
 	// It basically goes like this: Do a left rotate on every odd node in the backbone (root = 1).
@@ -464,41 +369,9 @@ bool IntBSTLevelTree(HIntBST htree)
 
 	// Quick test. The tree should be balanced. The height of is expected to be log2(# of nodes)
 	if(ceil(log2(nodecount)) != IntBSTGetHeight(htree))
-		{
-		
+		{		
 		return false;
 		}
-
-	////////////////////////////////////////
-	/* OLD WAY OF COPYING WIKIPEDIA - It works though.
-	// See https://en.wikipedia.org/wiki/Day%E2%80%93Stout%E2%80%93Warren_algorithm
-	
-	//Day–Stout–Warren_algorithm
-
-	// 1. Allocate a node, the "pseudo-root", and make the tree's actual root the right child of the pseudo-root.
-	struct GIntNode *pseudoroot = (struct GIntNode *)malloc(sizeof(struct GIntNode));
-	if(pseudoroot==0)
-		{
-		fprintf(stderr,"**Unable to alloc memory\n");
-		return false;
-		}
-	pseudoroot->Right = htree->Root;
-	pseudoroot->Left = 0;
-	pseudoroot->Value = 0;
-
-	// 2. Call tree-to-vine with the pseudo-root as its argument.
-	GTreeToVine(pseudoroot);
-
-	// 3. Call vine-to-tree on the pseudo-root and the size (number of elements) of the tree.
-	GVineToTree(pseudoroot, GTreeGetCount(pseudoroot));
-
-	// 4. Make the tree's actual root equal to the pseudo-root's right child.
-	htree->Root = pseudoroot->Right;
-
-	// 5. Dispose of the pseudo-root.
-	free(pseudoroot);
-	*/
-	/////////////////////////////////////////
 
 	return true;
 	}

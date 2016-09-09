@@ -1,2 +1,1 @@
--Fill out GRotateRight
 -Add a function to delete a node.

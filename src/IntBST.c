@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <math.h> // Using for the power function in VinesToLeaves
+#include <math.h>
 #include "IntBST.h"
 
 
@@ -421,6 +421,7 @@ bool IntBSTLevelTree(HIntBST htree)
 	//    \
 
 	struct GIntNode *currentNode = htree->Root;	// Start at the root.
+	int nodecount = 0;				// Count the number of node in the tree. 
 
 	while(currentNode != 0)				// Go through each node from root until the bottom right.
 		{
@@ -429,37 +430,44 @@ bool IntBSTLevelTree(HIntBST htree)
 			GRotateRight(currentNode);
 			}
 		currentNode = currentNode->Right;	// Update our current node.
+		nodecount += 1;				// Add one to our node count.
 		}
 	
 	// Quick test. If the height isn't equal to the number of nodes in the tree, this step failed.
-	if(IntBSTGetCount(htree) != IntBSTGetHeight(htree))
+	if(nodecount != IntBSTGetHeight(htree))
 		{
 		return false;
 		}
 
-	// 2. Do enough left rotations for the tree to become balanced?
-	// Do it the Day way for now.
-	// According to http://penguin.ewu.edu/~trolfe/DSWpaper/
-	/*
-	1. Reduce the length of the backbone by 1
-	2. Divide the length of the backbone by 2 [rounding down if the length is not even] to find the number of transformations, m.
-	3. If m is zero, exit; otherwise perform m transformations on the backbone.
-	4. Return to 1.
-	*/	
-
-	int backbonecount = IntBSTGetCount(htree);
-	while( (backbonecount-1)/2 != 0 )
-		{
-		printf("Backbonecount: %d     Transform: %d\n", backbonecount, (backbonecount-1)/2);
-		// Do the rotates.
-		for(int i = 0; i < (backbonecount-1)/2; i++)
-			{
-			GRotateLeft(htree->Root);
-			}
-
-		backbonecount = backbonecount - (backbonecount-1)/2 - 1;	// Actually reduce the backbone count now.
-		}
+	// 2. Do enough left rotations for the tree to become balanced.
+	// Source: http://www.radford.edu/~mhtay/ITEC360/webpage/Lecture/06_p2_new.pdf
+	// It basically goes like this: Do a left rotate on every odd node in the backbone (root = 1).
+	// Keep doing that until it's balanced.
 	
+	int times = nodecount;					// The number of times we rotate the backbone.
+	while(times > 1)
+		{
+		times /= 2;					// Increment the number of times. Every iteration halves the backbone.
+
+		// Do a left rotate on the root.
+		GRotateLeft(htree->Root);			// Rotate the root since it's odd.
+		struct GIntNode *currentNode = htree->Root;	// This is now the new root (even so don't rotate).
+
+		// Do a left rotate on all the rest of the odd nodes along the backbone.
+		for(int i = 0; i < times-1; i++)		// For the length of the backbone...
+			{
+			GRotateLeft(currentNode->Right);	// Rotate the right of the current node (which will always be odd.)
+			currentNode = currentNode->Right;	// Update the current node (which will always be an even one.)
+			}		
+		}	
+
+
+	// Quick test. The tree should be balanced. The height of is expected to be log2(# of nodes)
+	if(ceil(log2(nodecount)) != IntBSTGetHeight(htree))
+		{
+		
+		return false;
+		}
 
 	////////////////////////////////////////
 	/* OLD WAY OF COPYING WIKIPEDIA - It works though.

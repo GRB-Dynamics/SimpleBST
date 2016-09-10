@@ -360,7 +360,7 @@ bool IntBSTLevelTree(HIntBST htree)
 		if(i == 0)					// Special case where we rotate the root.
 			{
 			GRotateLeft(currentNode1);		// Rotate the root.
-			// Update the currentNode.
+			currentNode1 = htree-> Root; 	// Update the currentNode.
 			}
 		else						// For everything BUT the root.
 			{

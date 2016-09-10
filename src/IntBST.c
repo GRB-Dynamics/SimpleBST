@@ -346,9 +346,31 @@ bool IntBSTLevelTree(HIntBST htree)
 
 	// 2. Do enough left rotations for the tree to become balanced.
 	// Source: http://www.radford.edu/~mhtay/ITEC360/webpage/Lecture/06_p2_new.pdf
-	// It basically goes like this: Do a left rotate on every odd node in the backbone (root = 1).
+	// It basically goes like this: 
+	// 2.1. Do left rotates on x odd nodes in the backbone, where x is the number of nodes in the lowest level.
+	// 2.2. Do a left rotate on every odd node in the backbone (root = 1).
 	// Keep doing that until it's balanced.
 	
+	// 2.1. Do left rotates for every node on bottom level of finished tree.
+	int expected = ceil(log2(nodecount)) - nodecount; 	// Check the number of nodes we expect on the bottom level.
+	struct GIntNode *currentNode1 = htree->Root;	// This is now the new root (even so don't rotate).
+
+	for(int i = 0; i < expected; i++)
+		{
+		if(i == 0)					// Special case where we rotate the root.
+			{
+			GRotateLeft(currentNode1);		// Rotate the root.
+			// Update the currentNode.
+			}
+		else						// For everything BUT the root.
+			{
+			GRotateLeft(currentNode1->Right);	// Rotate the right of the current node.
+			currentNode1 = currentNode1->Right;	// Update the current node.
+			}
+		}
+	
+
+	// 2.2. Left rotate all nodes on the backbone until we balance the tree.
 	int times = nodecount;					// The number of times we rotate the backbone.
 	while(times > 1)
 		{
@@ -356,13 +378,13 @@ bool IntBSTLevelTree(HIntBST htree)
 
 		// Do a left rotate on the root.
 		GRotateLeft(htree->Root);			// Rotate the root since it's odd.
-		struct GIntNode *currentNode = htree->Root;	// This is now the new root (even so don't rotate).
+		struct GIntNode *currentNode2 = htree->Root;	// This is now the new root (even so don't rotate).
 
 		// Do a left rotate on all the rest of the odd nodes along the backbone.
 		for(int i = 0; i < times-1; i++)		// For the length of the backbone...
 			{
-			GRotateLeft(currentNode->Right);	// Rotate the right of the current node (which will always be odd.)
-			currentNode = currentNode->Right;	// Update the current node (which will always be an even one.)
+			GRotateLeft(currentNode2->Right);	// Rotate the right of the current node (which will always be odd.)
+			currentNode2 = currentNode2->Right;	// Update the current node (which will always be an even one.)
 			}		
 		}	
 
